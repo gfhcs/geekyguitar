@@ -1,0 +1,5 @@
+# KDE directory files:
+*.directory
+
+# Gereon's local scripts:
+/git-gui.sh
