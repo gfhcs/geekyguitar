@@ -22,6 +22,9 @@ void setup() {
 }
 
 const float csensor_threshold = 0.25f;
+unsigned long noteStartTime = 0;
+const int note_duration = 1500;
+
 
 void loop() {
   if (readCSensor() > csensor_threshold)
@@ -32,8 +35,52 @@ void loop() {
     
     getNotes(buttonStates, notes);
     
-    play(notes, 6);
-  }  
+    noteStartTime = millis();
+    startNotes(notes, 6);
+  }
+
+  if (noteStartTime >  note_duration)
+    endNotes();
+}
+
+
+const byte base_note = 44;
+const int string_delay = 10;
+const int note_velocity = 64;
+byte* startedNotes = new byte[20]; //20 should be enough.
+int startedNotesCount = 0;
+
+void startNotes(byte* notes, int noteCount)
+{
+    endNotes();
+  
+    startedNotesCount = noteCount;
+  
+    for (int i = 0; i < noteCount; i++)
+    {
+        byte note = notes[i];
+        startedNotes[i] = note;
+        if (note > 0)
+        {
+            MIDI.sendNoteOn(base_note + note,note_velocity,1);
+            delay(string_delay);
+        }
+    }
+}
+
+void endNotes()
+{    
+    for (int i = 0; i < startedNotesCount; i++)
+    {
+        byte note = startedNotes[i];
+        if (note > 0)
+        {
+            MIDI.sendNoteOff(base_note + note,0,1);
+            delay(string_delay);
+        }
+    }
+    
+    startedNotesCount = 0;
 }
 
 
@@ -78,35 +125,6 @@ byte getButtonStates()
   return dataIn;
 }
 
-const byte base_note = 44;
-const int note_delay = 1500;
-const int string_delay = 10;
-const int note_velocity = 64;
-
-void play(byte* notes, int length)
-{
-    for (int i = 0; i < length; i++)
-    {
-        byte note = notes[i];
-        if (note > 0)
-        {
-            MIDI.sendNoteOn(base_note + note,note_velocity,1);
-            delay(string_delay);
-        }
-    }
-    
-    delay(note_delay);
-    
-    for (int i = 0; i < length; i++)
-    {
-        byte note = notes[i];
-        if (note > 0)
-        {
-            MIDI.sendNoteOff(base_note + note,0,1);
-            delay(string_delay);
-        }
-    }
-}
 
 /*
 void getNotes(byte buttonStates, byte* notes)
