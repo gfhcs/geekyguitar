@@ -108,18 +108,6 @@ void play(byte* notes, int length)
     }
 }
 
-/*
-void getNotes(byte buttonStates, byte* notes)
-{  
-  
-  notes[0] = 1;
-  notes[1] = 5;
-  notes[2] = 8;
-  notes[3] = 13;
-  notes[4] = 17;
-  notes[5] = 20;
-}*/
-
 void getNotes(byte data, byte notes[])
 {
   // Button1: A
